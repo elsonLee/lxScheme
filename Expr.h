@@ -20,6 +20,7 @@ enum class Type
     Relation,
     Define,
     Begin,
+    If,
     Cond,
     Else,
     Lambda,
@@ -292,6 +293,18 @@ class LambdaExpr final : public List
         LambdaExpr (std::vector<Expr*>& params, Expr* body);
 
         ~LambdaExpr () = default;
+
+        Expr* accept (IVisitor& visitor, Env& env) override;
+};
+
+class IfExpr final : public List
+{
+    public:
+        IfExpr () :
+            List(Type::If)
+        {}
+
+        ~IfExpr () = default;
 
         Expr* accept (IVisitor& visitor, Env& env) override;
 };

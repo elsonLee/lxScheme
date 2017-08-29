@@ -34,7 +34,6 @@ class Repl
             Debugger debugger;
             Env env(nullptr);
 
-            float a;
             try {
                 while (1)
                 {
@@ -43,14 +42,11 @@ class Repl
                     if (line == "quit") {
                         break;
                     }
-                    a = std::stof(line);
-                    printf("a: %f\n", a);
-                    //debugger.call(eval.call(Parser::run(Tokenizer::run(line)), env));
+                    debugger.call(eval.call(Parser::run(Tokenizer::run(line)), env));
                 }
             }
             catch (const std::exception& e)
             {
-                //printf("%s\n", e.what().c_str());
                 std::cout << e.what() << std::endl;
                 return;
             }
@@ -141,6 +137,9 @@ main (int32_t argc, char* argv[])
     test(eval, env, "(- 7.2 3.4)");
     test(eval, env, "(* 7.2 3.4)");
     test(eval, env, "(/ 7.2 3.4)");
+
+    test(eval, env, "(if (> 3 2) 3.0 2)");
+    test(eval, env, "(if (< 3 2) 3.0 2)");
 #endif
 
     return 0;

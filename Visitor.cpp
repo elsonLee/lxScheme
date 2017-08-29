@@ -134,6 +134,12 @@ Debugger::run (LambdaExpr* lambdaExpr, Env& env)
 }
 
 Expr*
+Debugger::run (IfExpr* ifExpr, Env& env)
+{
+    return run_specific_proc(ifExpr, env);
+}
+
+Expr*
 Debugger::run (CondExpr* condExpr, Env& env)
 {
     return run_specific_proc(condExpr, env);
@@ -353,6 +359,20 @@ Expr*
 Eval::run (LambdaExpr* lambdaExpr, Env& env)
 {
     return lambdaExpr;
+}
+
+Expr*
+Eval::run (IfExpr* ifExpr, Env& env)
+{
+    auto& ifExprs = ifExpr->_exprs;
+    assert(ifExprs.size() == 3);
+
+    Expr* predicate = call(ifExprs[0], env);
+    if (*dynamic_cast<Boolean*>(predicate) == Boolean(true)) {
+        return call(ifExprs[1], env);
+    } else {
+        return call(ifExprs[2], env);
+    }
 }
 
 Expr*

@@ -21,6 +21,8 @@ Expr::type_name (Expr* expr)
         ret = "<Float>"; break;
     case Type::List:
         ret = "<List>"; break;
+    case Type::If:
+        ret = "<If>"; break;
     case Type::Cons:
         ret = "<Cons>"; break;
     case Type::Arithmetic:
@@ -78,6 +80,12 @@ Boolean::accept (IVisitor& visitor, Env& env)
 
 Expr*
 List::accept (IVisitor& visitor, Env& env)
+{
+    return visitor.run(this, env);
+}
+
+Expr*
+IfExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
 }

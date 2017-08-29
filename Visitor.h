@@ -18,6 +18,7 @@ class ArithmeticExpr;
 class RelationExpr;
 class DefineExpr;
 class BeginExpr;
+class IfExpr;
 class CondExpr;
 class ElseExpr;
 class LambdaExpr;
@@ -32,11 +33,12 @@ class IVisitor
         virtual Expr* run (Symbol* sym,          Env& env) = 0;
         virtual Expr* run (Boolean* sym,         Env& env) = 0;
         virtual Expr* run (List* list,           Env& env) = 0;
-        virtual Expr* run (ConsExpr* cons,       Env& env) = 0;
+        virtual Expr* run (ConsExpr* expr,       Env& env) = 0;
         virtual Expr* run (ArithmeticExpr* expr, Env& env) = 0;
         virtual Expr* run (RelationExpr* expr,   Env& env) = 0;
         virtual Expr* run (DefineExpr* expr,     Env& env) = 0;
         virtual Expr* run (BeginExpr* expr,      Env& env) = 0;
+        virtual Expr* run (IfExpr* expr,         Env& env) = 0;
         virtual Expr* run (CondExpr* expr,       Env& env) = 0;
         virtual Expr* run (ElseExpr* expr,       Env& env) = 0;
         virtual Expr* run (LambdaExpr* expr,     Env& env) = 0;
@@ -64,6 +66,7 @@ class Debugger final : public IVisitor
         Expr* run (DefineExpr* expr,     Env& env) override;
         Expr* run (BeginExpr* expr,      Env& env) override;
         Expr* run (LambdaExpr* expr,     Env& env) override;
+        Expr* run (IfExpr* expr,         Env& env) override;
         Expr* run (CondExpr* expr,       Env& env) override;
         Expr* run (ElseExpr* expr,       Env& env) override;
 };
@@ -89,6 +92,7 @@ class Eval final : public IVisitor
         Expr* run (DefineExpr* expr,     Env& env) override;
         Expr* run (BeginExpr* expr,      Env& env) override;
         Expr* run (LambdaExpr* expr,     Env& env) override;
+        Expr* run (IfExpr* expr,         Env& env) override;
         Expr* run (CondExpr* expr,       Env& env) override;
         Expr* run (ElseExpr* expr,       Env& env) override;
 };
