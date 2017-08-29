@@ -28,7 +28,7 @@ class Parser
         }
 
         // FIXME
-        static bool is_num (const std::string& token)
+        static bool is_integer (const std::string& token)
         {
             bool ret = false;
             uint32_t size = token.size();
@@ -36,6 +36,34 @@ class Parser
                 ((token[0] == '+' || token[0] == '-') && size > 1)) {
                 ret = true;
                 for (uint32_t i = 1; i < size; i++) {
+                    if (!is_digit(token[i])) {
+                        ret = false;
+                        break;
+                    }
+                }
+            }
+            return ret;
+        }
+
+        // FIXME
+        static bool is_float (const std::string& token)
+        {
+            bool ret = false;
+            uint32_t size = token.size();
+            if (is_digit(token[0]) ||
+                ((token[0] == '+' || token[0] == '-') && size > 1)) {
+                ret = true;
+                bool has_dot = false;
+                for (uint32_t i = 1; i < size; i++) {
+                    if (token[i] == '.') {
+                        if (!has_dot) {
+                            has_dot = true;
+                            continue;
+                        } else {
+                            ret = false;
+                            break;
+                        }
+                    }
                     if (!is_digit(token[i])) {
                         ret = false;
                         break;

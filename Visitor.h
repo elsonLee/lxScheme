@@ -8,7 +8,8 @@ namespace lx {
 
 class Env;
 class Expr;
-class Number;
+class Integer;
+class Float;
 class Symbol;
 class Boolean;
 class List;
@@ -26,7 +27,8 @@ class IVisitor
     public:
         virtual ~IVisitor () = default;
 
-        virtual Expr* run (Number* number,       Env& env) = 0;
+        virtual Expr* run (Integer* number,      Env& env) = 0;
+        virtual Expr* run (Float* number,        Env& env) = 0;
         virtual Expr* run (Symbol* sym,          Env& env) = 0;
         virtual Expr* run (Boolean* sym,         Env& env) = 0;
         virtual Expr* run (List* list,           Env& env) = 0;
@@ -45,13 +47,14 @@ class Debugger final : public IVisitor
     public:
         Debugger () = default;
 
-        Expr* call (const std::string& prefix, Expr* expr);
+        Expr* call (Expr* expr);
 
         Expr* run_relation_proc (RelationExpr* expr,     Env& env);
         Expr* run_arithmetic_proc (ArithmeticExpr* expr, Env& env);
         Expr* run_specific_proc (List* expr,             Env& env);
 
-        Expr* run (Number* number,       Env& env) override;
+        Expr* run (Integer* number,      Env& env) override;
+        Expr* run (Float* number,        Env& env) override;
         Expr* run (Symbol* sym,          Env& env) override;
         Expr* run (Boolean* sym,         Env& env) override;
         Expr* run (List* list,           Env& env) override;
@@ -78,7 +81,8 @@ class Eval final : public IVisitor
 
         Expr* call (Expr* expr, Env& env);
 
-        Expr* run (Number* number,       Env& env) override;
+        Expr* run (Integer* number,      Env& env) override;
+        Expr* run (Float* number,        Env& env) override;
         Expr* run (Symbol* sym,          Env& env) override;
         Expr* run (Boolean* sym,         Env& env) override;
         Expr* run (List* list,           Env& env) override;

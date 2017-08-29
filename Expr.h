@@ -12,7 +12,8 @@ enum class Type
 {
     Symbol,
     Boolean,
-    Number,
+    Integer,
+    Float,
     List,
     Cons,
     Arithmetic,
@@ -45,26 +46,107 @@ class Expr : public AutoReleaseObj
         {}
 };
 
-class Number final : public Expr
+class Integer;
+class Float;
+class Number : public Expr
 {
     public:
-        Number (int32_t num) :
-            Expr(Type::Number),
+        Number (Type type): Expr(type) {}
+        virtual ~Number () = default;
+
+        virtual Expr* accept (IVisitor& visitor, Env& env) = 0;
+
+        static Integer& dynamic_type (Integer& num) { return num; }
+        static Float& dynamic_type (Float& num) { return num; }
+
+        virtual Number& operator+ (Number& rhs) = 0;
+        virtual Number& operator- (Number& rhs) = 0;
+        virtual Number& operator* (Number& rhs) = 0;
+        virtual Number& operator/ (Number& rhs) = 0;
+
+        virtual Number& beAdd (Integer& rhs) = 0;
+        virtual Number& beSub (Integer& rhs) = 0;
+        virtual Number& beMul (Integer& rhs) = 0;
+        virtual Number& beDiv (Integer& rhs) = 0;
+
+        virtual Number& beAdd (Float& rhs) = 0;
+        virtual Number& beSub (Float& rhs) = 0;
+        virtual Number& beMul (Float& rhs) = 0;
+        virtual Number& beDiv (Float& rhs) = 0;
+};
+
+class Integer final : public Number
+{
+    public:
+        Integer (int32_t num) :
+            Number(Type::Integer),
             _num(num)
         {}
 
-        ~Number () = default;
-
-        bool operator== (const Number& rhs) { return _num == rhs._num; }
-        bool operator!= (const Number& rhs) { return _num != rhs._num; }
-        bool operator<  (const Number& rhs) { return _num <  rhs._num; }
-        bool operator>  (const Number& rhs) { return _num >  rhs._num; }
-        bool operator<= (const Number& rhs) { return _num <= rhs._num; }
-        bool operator>= (const Number& rhs) { return _num >= rhs._num; }
+        ~Integer () = default;
 
         Expr* accept (IVisitor& visitor, Env& env) override;
 
+        bool operator== (const Integer& rhs) { return _num == rhs._num; }
+        bool operator!= (const Integer& rhs) { return _num != rhs._num; }
+        bool operator<  (const Integer& rhs) { return _num <  rhs._num; }
+        bool operator>  (const Integer& rhs) { return _num >  rhs._num; }
+        bool operator<= (const Integer& rhs) { return _num <= rhs._num; }
+        bool operator>= (const Integer& rhs) { return _num >= rhs._num; }
+
+        Number& operator+ (Number& rhs) override;
+        Number& operator- (Number& rhs) override;
+        Number& operator* (Number& rhs) override;
+        Number& operator/ (Number& rhs) override;
+
+        Number& beAdd (Integer& rhs) override;
+        Number& beSub (Integer& rhs) override;
+        Number& beMul (Integer& rhs) override;
+        Number& beDiv (Integer& rhs) override;
+
+        Number& beAdd (Float& rhs) override;
+        Number& beSub (Float& rhs) override;
+        Number& beMul (Float& rhs) override;
+        Number& beDiv (Float& rhs) override;
+
         int32_t _num;
+};
+
+class Float final : public Number
+{
+    public:
+        Float (float num) :
+            Number(Type::Float),
+            _num(num)
+        {}
+
+        ~Float () = default;
+
+        Expr* accept (IVisitor& visitor, Env& env) override;
+
+        bool operator== (const Float& rhs) { return _num == rhs._num; }
+        bool operator!= (const Float& rhs) { return _num != rhs._num; }
+        bool operator<  (const Float& rhs) { return _num <  rhs._num; }
+        bool operator>  (const Float& rhs) { return _num >  rhs._num; }
+        bool operator<= (const Float& rhs) { return _num <= rhs._num; }
+        bool operator>= (const Float& rhs) { return _num >= rhs._num; }
+
+        Number& operator+ (Number& rhs) override;
+        Number& operator- (Number& rhs) override;
+        Number& operator* (Number& rhs) override;
+        Number& operator/ (Number& rhs) override;
+
+        Number& beAdd (Integer& rhs) override;
+        Number& beSub (Integer& rhs) override;
+        Number& beMul (Integer& rhs) override;
+        Number& beDiv (Integer& rhs) override;
+
+        Number& beAdd (Float& rhs) override;
+        Number& beSub (Float& rhs) override;
+        Number& beMul (Float& rhs) override;
+        Number& beDiv (Float& rhs) override;
+
+        float _num;
 };
 
 class Symbol : public Expr

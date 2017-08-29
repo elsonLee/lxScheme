@@ -10,10 +10,9 @@ namespace lx {
 //! call
 
 Expr*
-Debugger::call (const std::string& prefix, Expr* expr)
+Debugger::call (Expr* expr)
 {
     Env env(nullptr);
-    printf("[%s]:", prefix.c_str());
     Expr* ret = expr->accept(*this, env);
     printf("\n");
     return ret;
@@ -28,16 +27,23 @@ Eval::call (Expr* expr, Env& env)
 //! run
 
 Expr*
-Debugger::run (Number* number, Env& env)
+Debugger::run (Integer* number, Env& env)
 {
-    printf("\n%d%s", number->_num, Expr::type_name(number).c_str());
+    printf("%d%s", number->_num, Expr::type_name(number).c_str());
+    return number;
+}
+
+Expr*
+Debugger::run (Float* number, Env& env)
+{
+    printf("%f%s", number->_num, Expr::type_name(number).c_str());
     return number;
 }
 
 Expr*
 Debugger::run (Symbol* sym, Env& env)
 {
-    printf("\n%s%s", sym->_str.c_str(), Expr::type_name(sym).c_str());
+    printf("%s%s", sym->_str.c_str(), Expr::type_name(sym).c_str());
     return sym;
 }
 
@@ -50,7 +56,7 @@ Debugger::run (Boolean* sym, Env& env)
 Expr*
 Debugger::run (List* list, Env& env)
 {
-    printf("\n{");
+    printf("{");
     for (auto& e : list->_exprs) {
         e->accept(*this, env);
     }
@@ -61,7 +67,7 @@ Debugger::run (List* list, Env& env)
 Expr*
 Debugger::run_relation_proc (RelationExpr* expr, Env& env)
 {
-    printf("\n(%s){", expr->_str.c_str());
+    printf("(%s){", expr->_str.c_str());
     for (auto& e : expr->_exprs) {
         e->accept(*this, env);
     }
@@ -72,7 +78,7 @@ Debugger::run_relation_proc (RelationExpr* expr, Env& env)
 Expr*
 Debugger::run_arithmetic_proc (ArithmeticExpr* expr, Env& env)
 {
-    printf("\n(%s){", expr->_str.c_str());
+    printf("(%s){", expr->_str.c_str());
     for (auto& e : expr->_exprs) {
         e->accept(*this, env);
     }
@@ -83,7 +89,7 @@ Debugger::run_arithmetic_proc (ArithmeticExpr* expr, Env& env)
 Expr*
 Debugger::run_specific_proc (List* expr, Env& env)
 {
-    printf("\n%s{", Expr::type_name(expr).c_str());
+    printf("%s{", Expr::type_name(expr).c_str());
     for (auto& e : expr->_exprs) {
         e->accept(*this, env);
     }
@@ -141,7 +147,13 @@ Debugger::run (ElseExpr* elseExpr, Env& env)
 
 
 Expr*
-Eval::run (Number* number, Env& env)
+Eval::run (Integer* number, Env& env)
+{
+    return number;
+}
+
+Expr*
+Eval::run (Float* number, Env& env)
 {
     return number;
 }
@@ -181,7 +193,7 @@ Eval::run (List* list, Env& env)
         }
         else
         {
-            auto&& map_func = [&](Expr* e)->Expr* { call(e, env); };
+            auto&& map_func = [&](Expr* e)->Expr* { return call(e, env); };
             std::transform(exprs.begin(), exprs.end(), exprs.begin(), map_func);
             return list;
         }
@@ -235,42 +247,73 @@ Eval::run_arithmetic_proc (List* expr, Func& func, Env& env)
     }
 
     Expr* init = call(exprs[0], env);
-    if (init->_type != Type::Number) {
-        fprintf(stderr, "%d: %s non-Number type data\n", __LINE__,  Expr::type_name(expr).c_str());
+    if (init->_type != Type::Integer) {
+        fprintf(stderr, "%d: %s non-Integer type data\n", __LINE__,  Expr::type_name(expr).c_str());
         exit(-1);
     }
 
-    int32_t val = dynamic_cast<Number*>(init)->_num;
+    int32_t val = dynamic_cast<Integer*>(init)->_num;
 
     for (auto i = 1; i < size; i++) {
         Expr* operands = call(exprs[i], env);
-        if (operands->_type != Type::Number) {
-            fprintf(stderr, "%d: %s non-Number type data\n", __LINE__, Expr::type_name(expr).c_str());
+        if (operands->_type != Type::Integer) {
+            fprintf(stderr, "%d: %s non-Integer type data\n", __LINE__, Expr::type_name(expr).c_str());
             exit(-1);
         }
-        assert(operands->_type == Type::Number);
-        func(dynamic_cast<Number*>(operands), val);
+        assert(operands->_type == Type::Integer);
+        func(dynamic_cast<Integer*>(operands), val);
     }
-    return new Number(val);
+    return new Integer(val);
 }
 
 Expr*
 Eval::run (ArithmeticExpr* expr, Env& env)
 {
+#if 1
+        std::vector<Expr*>& exprs = expr->_exprs;
+        int32_t size = exprs.size();
+        if (size < 2) {
+            fprintf(stderr, "%d: %s operands less than 2\n", __LINE__, Expr::type_name(expr).c_str());
+            exit(-1);
+        }
+
+        Number* init = dynamic_cast<Number*>(call(exprs[0], env));
+        Number* ret = init;
+
+        for (auto i = 1; i < size; i++) {
+            Number* operands = dynamic_cast<Number*>(call(exprs[i], env));
+            if (expr->_str == "+") {
+                ret = &(*ret + *operands);
+            }
+            else if (expr->_str == "-") {
+                ret = &(*ret - *operands);
+            }
+            else if (expr->_str == "*") {
+                ret = &(*ret * *operands);
+            }
+            else if (expr->_str == "/") {
+                ret = &(*ret / *operands);
+            }
+            else {
+                assert(0);
+            }
+        }
+        return ret;
+#else
     if (expr->_str == "+") {
-        auto&& addFunc = [](Number* num, int32_t& init){ init += num->_num; };
+        auto&& addFunc = [](Integer* num, int32_t& init){ init += num->_num; };
         return run_arithmetic_proc(expr, addFunc, env);
     }
     else if (expr->_str == "-") {
-        auto&& subFunc = [](Number* num, int32_t& init){ init -= num->_num; };
+        auto&& subFunc = [](Integer* num, int32_t& init){ init -= num->_num; };
         return run_arithmetic_proc(expr, subFunc, env);
     }
     else if (expr->_str == "*") {
-        auto&& mulFunc = [](Number* num, int32_t& init){ init *= num->_num; };
+        auto&& mulFunc = [](Integer* num, int32_t& init){ init *= num->_num; };
         return run_arithmetic_proc(expr, mulFunc, env);
     }
     else if (expr->_str == "/") {
-        auto&& divFunc = [](Number* num, int32_t& init)
+        auto&& divFunc = [](Integer* num, int32_t& init)
         {
             if (num->_num == 0) {
                 fprintf(stderr, "%d: Div zero\n", __LINE__);
@@ -284,6 +327,7 @@ Eval::run (ArithmeticExpr* expr, Env& env)
         assert(0);
         return nullptr;
     }
+#endif
 }
 
 Expr*
@@ -295,9 +339,9 @@ Eval::run (RelationExpr* relationExpr, Env& env)
     Expr* x = call(exprs[0], env);
     Expr* y = call(exprs[1], env);
 
-    if (x->_type == y->_type && x->_type == Type::Number) {
-        Number* numX = dynamic_cast<Number*>(x);
-        Number* numY = dynamic_cast<Number*>(y);
+    if (x->_type == y->_type && x->_type == Type::Integer) {
+        Integer* numX = dynamic_cast<Integer*>(x);
+        Integer* numY = dynamic_cast<Integer*>(y);
         if (relationExpr->_str == "=") {
             return (*numX == *numY)? new Boolean(true) : new Boolean(false);
         } else if (relationExpr->_str == "<") {
@@ -377,6 +421,7 @@ Eval::run (CondExpr* condExpr, Env& env)
 {
     for (auto& expr : condExpr->_exprs)
     {
+        printf("cond type: %s\n", Expr::type_name(expr).c_str());
         assert(expr->_type == Type::List);
         List* exprList = dynamic_cast<List*>(expr);
         assert(exprList->_exprs.size() == 2);

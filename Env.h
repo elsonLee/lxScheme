@@ -38,11 +38,11 @@ class Env
 {
     public:
         Env (Env* upperEnv) :
-            _frame(), _upperEnv(upperEnv)
+            _upperEnv(upperEnv), _frame()
         {}
 
         Env (Env& upperEnv) :
-            _frame(), _upperEnv(&upperEnv)
+            _upperEnv(&upperEnv), _frame()
         {}
 
         void extend_symbols (std::vector<std::string>& params,

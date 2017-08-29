@@ -97,8 +97,10 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
         iter = std::next(iter, 1);
         return expr;
     } else {
-        if (is_num(token)) {
-            return new Number(atoi(token.c_str()));
+        if (is_integer(token)) {
+            return new Integer(std::stoi(token));
+        } else if (is_float(token)) {
+            return new Float(std::stof(token));
         } else {
             if (token == "else")
             {
