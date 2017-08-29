@@ -235,9 +235,8 @@ Eval::run_proc (LambdaExpr* lambdaExpr, std::vector<Expr*>& args, Env& env)
     return call(bodyExpr, lambdaEnv);
 }
 
-template <typename Func>
 Expr*
-Eval::run_arithmetic_proc (List* expr, Func& func, Env& env)
+Eval::run (ArithmeticExpr* expr, Env& env)
 {
     std::vector<Expr*>& exprs = expr->_exprs;
     int32_t size = exprs.size();
@@ -246,88 +245,28 @@ Eval::run_arithmetic_proc (List* expr, Func& func, Env& env)
         exit(-1);
     }
 
-    Expr* init = call(exprs[0], env);
-    if (init->_type != Type::Integer) {
-        fprintf(stderr, "%d: %s non-Integer type data\n", __LINE__,  Expr::type_name(expr).c_str());
-        exit(-1);
-    }
-
-    int32_t val = dynamic_cast<Integer*>(init)->_num;
+    Number* init = dynamic_cast<Number*>(call(exprs[0], env));
+    Number* ret = init;
 
     for (auto i = 1; i < size; i++) {
-        Expr* operands = call(exprs[i], env);
-        if (operands->_type != Type::Integer) {
-            fprintf(stderr, "%d: %s non-Integer type data\n", __LINE__, Expr::type_name(expr).c_str());
-            exit(-1);
+        Number* operands = dynamic_cast<Number*>(call(exprs[i], env));
+        if (expr->_str == "+") {
+            ret = &(*ret + *operands);
         }
-        assert(operands->_type == Type::Integer);
-        func(dynamic_cast<Integer*>(operands), val);
-    }
-    return new Integer(val);
-}
-
-Expr*
-Eval::run (ArithmeticExpr* expr, Env& env)
-{
-#if 1
-        std::vector<Expr*>& exprs = expr->_exprs;
-        int32_t size = exprs.size();
-        if (size < 2) {
-            fprintf(stderr, "%d: %s operands less than 2\n", __LINE__, Expr::type_name(expr).c_str());
-            exit(-1);
+        else if (expr->_str == "-") {
+            ret = &(*ret - *operands);
         }
-
-        Number* init = dynamic_cast<Number*>(call(exprs[0], env));
-        Number* ret = init;
-
-        for (auto i = 1; i < size; i++) {
-            Number* operands = dynamic_cast<Number*>(call(exprs[i], env));
-            if (expr->_str == "+") {
-                ret = &(*ret + *operands);
-            }
-            else if (expr->_str == "-") {
-                ret = &(*ret - *operands);
-            }
-            else if (expr->_str == "*") {
-                ret = &(*ret * *operands);
-            }
-            else if (expr->_str == "/") {
-                ret = &(*ret / *operands);
-            }
-            else {
-                assert(0);
-            }
+        else if (expr->_str == "*") {
+            ret = &(*ret * *operands);
         }
-        return ret;
-#else
-    if (expr->_str == "+") {
-        auto&& addFunc = [](Integer* num, int32_t& init){ init += num->_num; };
-        return run_arithmetic_proc(expr, addFunc, env);
+        else if (expr->_str == "/") {
+            ret = &(*ret / *operands);
+        }
+        else {
+            assert(0);
+        }
     }
-    else if (expr->_str == "-") {
-        auto&& subFunc = [](Integer* num, int32_t& init){ init -= num->_num; };
-        return run_arithmetic_proc(expr, subFunc, env);
-    }
-    else if (expr->_str == "*") {
-        auto&& mulFunc = [](Integer* num, int32_t& init){ init *= num->_num; };
-        return run_arithmetic_proc(expr, mulFunc, env);
-    }
-    else if (expr->_str == "/") {
-        auto&& divFunc = [](Integer* num, int32_t& init)
-        {
-            if (num->_num == 0) {
-                fprintf(stderr, "%d: Div zero\n", __LINE__);
-            }
-            init /= num->_num;
-        };
-        return run_arithmetic_proc(expr, divFunc, env);
-    }
-    else
-    {
-        assert(0);
-        return nullptr;
-    }
-#endif
+    return ret;
 }
 
 Expr*
