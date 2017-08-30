@@ -57,8 +57,26 @@ class Number : public Expr
 
         virtual Expr* accept (IVisitor& visitor, Env& env) = 0;
 
-        static Integer& dynamic_type (Integer& num) { return num; }
-        static Float& dynamic_type (Float& num) { return num; }
+        virtual bool operator== (const Number& rhs) const = 0;
+        virtual bool operator!= (const Number& rhs) const = 0;
+        virtual bool operator<  (const Number& rhs) const = 0;
+        virtual bool operator>  (const Number& rhs) const = 0;
+        virtual bool operator<= (const Number& rhs) const = 0;
+        virtual bool operator>= (const Number& rhs) const = 0;
+        virtual bool operator== (const Integer& rhs) const = 0;
+        virtual bool operator!= (const Integer& rhs) const = 0;
+        virtual bool operator<  (const Integer& rhs) const = 0;
+        virtual bool operator>  (const Integer& rhs) const = 0;
+        virtual bool operator<= (const Integer& rhs) const = 0;
+        virtual bool operator>= (const Integer& rhs) const = 0;
+        virtual bool operator== (const Float& rhs) const = 0;
+        virtual bool operator!= (const Float& rhs) const = 0;
+        virtual bool operator<  (const Float& rhs) const = 0;
+        virtual bool operator>  (const Float& rhs) const = 0;
+        virtual bool operator<= (const Float& rhs) const = 0;
+        virtual bool operator>= (const Float& rhs) const = 0;
+
+        virtual Number& operator- () = 0;
 
         virtual Number& operator+ (Number& rhs) = 0;
         virtual Number& operator- (Number& rhs) = 0;
@@ -88,12 +106,27 @@ class Integer final : public Number
 
         Expr* accept (IVisitor& visitor, Env& env) override;
 
-        bool operator== (const Integer& rhs) { return _num == rhs._num; }
-        bool operator!= (const Integer& rhs) { return _num != rhs._num; }
-        bool operator<  (const Integer& rhs) { return _num <  rhs._num; }
-        bool operator>  (const Integer& rhs) { return _num >  rhs._num; }
-        bool operator<= (const Integer& rhs) { return _num <= rhs._num; }
-        bool operator>= (const Integer& rhs) { return _num >= rhs._num; }
+        bool operator== (const Number& rhs) const override { return rhs == *this; }
+        bool operator!= (const Number& rhs) const override { return rhs != *this; }
+        bool operator<  (const Number& rhs) const override { return rhs >= *this; }
+        bool operator>  (const Number& rhs) const override { return rhs <= *this; }
+        bool operator<= (const Number& rhs) const override { return rhs >  *this; }
+        bool operator>= (const Number& rhs) const override { return rhs <  *this; }
+
+        bool operator== (const Integer& rhs) const;
+        bool operator!= (const Integer& rhs) const;
+        bool operator<  (const Integer& rhs) const;
+        bool operator>  (const Integer& rhs) const;
+        bool operator<= (const Integer& rhs) const;
+        bool operator>= (const Integer& rhs) const;
+        bool operator== (const Float& rhs) const;
+        bool operator!= (const Float& rhs) const;
+        bool operator<  (const Float& rhs) const;
+        bool operator>  (const Float& rhs) const;
+        bool operator<= (const Float& rhs) const;
+        bool operator>= (const Float& rhs) const;
+
+        Number& operator- () { _num = -_num; return *this; }
 
         Number& operator+ (Number& rhs) override;
         Number& operator- (Number& rhs) override;
@@ -125,12 +158,27 @@ class Float final : public Number
 
         Expr* accept (IVisitor& visitor, Env& env) override;
 
-        bool operator== (const Float& rhs) { return _num == rhs._num; }
-        bool operator!= (const Float& rhs) { return _num != rhs._num; }
-        bool operator<  (const Float& rhs) { return _num <  rhs._num; }
-        bool operator>  (const Float& rhs) { return _num >  rhs._num; }
-        bool operator<= (const Float& rhs) { return _num <= rhs._num; }
-        bool operator>= (const Float& rhs) { return _num >= rhs._num; }
+        bool operator== (const Number& rhs) const override { return rhs == *this; }
+        bool operator!= (const Number& rhs) const override { return rhs != *this; }
+        bool operator<  (const Number& rhs) const override { return rhs >= *this; }
+        bool operator>  (const Number& rhs) const override { return rhs <= *this; }
+        bool operator<= (const Number& rhs) const override { return rhs >  *this; }
+        bool operator>= (const Number& rhs) const override { return rhs <  *this; }
+
+        bool operator== (const Integer& rhs) const;
+        bool operator!= (const Integer& rhs) const;
+        bool operator<  (const Integer& rhs) const;
+        bool operator>  (const Integer& rhs) const;
+        bool operator<= (const Integer& rhs) const;
+        bool operator>= (const Integer& rhs) const;
+        bool operator== (const Float& rhs) const;
+        bool operator!= (const Float& rhs) const;
+        bool operator<  (const Float& rhs) const;
+        bool operator>  (const Float& rhs) const;
+        bool operator<= (const Float& rhs) const;
+        bool operator>= (const Float& rhs) const;
+
+        Number& operator- () { _num = -_num; return *this; }
 
         Number& operator+ (Number& rhs) override;
         Number& operator- (Number& rhs) override;

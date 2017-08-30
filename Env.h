@@ -8,19 +8,6 @@
 namespace lx {
 
 class Expr;
-class Number;
-class Symbol;
-class Boolean;
-class List;
-class ConsExpr;
-class ArithmeticExpr;
-class RelationExpr;
-class DefineExpr;
-class BeginExpr;
-class CondExpr;
-class ElseExpr;
-class LambdaExpr;
-
 class Frame
 {
     public:

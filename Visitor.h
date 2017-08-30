@@ -74,6 +74,7 @@ class Debugger final : public IVisitor
 class Eval final : public IVisitor
 {
     private:
+        Expr* run_proc (ArithmeticExpr* arithExpr, std::vector<Expr*>& args, Env& env);
         Expr* run_proc (LambdaExpr* lambda, std::vector<Expr*>& args, Env& env);
 
     public:

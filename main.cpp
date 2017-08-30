@@ -1,16 +1,5 @@
-#include <cstdio>
-#include <cstdlib>
-#include <cstdint>
-#include <cassert>
-#include <utility>
-#include <memory>
 #include <string>
-#include <vector>
-#include <list>
-#include <unordered_set>
-#include <unordered_map>
-#include <functional>
-#include <algorithm>
+#include <fstream>
 #include <iostream>
 
 #include "Parser.h"
@@ -19,7 +8,7 @@
 #include "Expr.h"
 #include "AutoReleasePool.h"
 
-#define REPL
+//#define REPL
 
 namespace lx
 {
@@ -57,15 +46,29 @@ Expr*
 test (Eval& eval, Env& env, const std::string& code)
 {
     Debugger debugger;
-    printf("[Code]: %s\n", code.c_str());
-    printf("[ParserResult]:\n");
-    Expr* parserResult = debugger.call(Parser::run(Tokenizer::run(code)));
-    printf("[EvalResult]:\n");
-    Expr* evalResult = debugger.call(eval.call(parserResult, env));
-    printf("\n");
+    Expr* evalResult = nullptr;
+
+    std::vector<std::string> tokens = Tokenizer::run(code);
+    auto&& iter = tokens.cbegin();
+
+    while (iter != tokens.cend())
+    {
+        //printf("[Code]: %s\n", code.c_str());
+        printf("[ParserResult]:\n");
+        Expr* parserResult = debugger.call(Parser::run(iter));
+        printf("[EvalResult]:\n");
+        evalResult = debugger.call(eval.call(parserResult, env));
+        printf("\n");
+    }
     return evalResult;
 }
 
+void
+add_global_symbol (Eval& eval, Env& env, const std::string& name, const std::string& code)
+{
+    Expr* expr = eval.call(Parser::run(Tokenizer::run(code)), env);
+    env.define_symbol(name, expr);
+}
 
 }
 
@@ -82,8 +85,27 @@ main (int32_t argc, char* argv[])
     // testcase
     Eval eval;
     Env env(nullptr);
-    test(eval, env, "(1)");
+    add_global_symbol(eval, env, "+", "(+)");
+    add_global_symbol(eval, env, "-", "(-)");
+    add_global_symbol(eval, env, "*", "(*)");
+    add_global_symbol(eval, env, "/", "(/)");
 
+    // FIXME
+    if (argc == 2) {
+        std::string line;
+        std::string code;
+        std::string fileName(argv[1]);
+        std::ifstream fileStream(fileName);
+        if (fileStream) {
+            while (getline(fileStream, line)) {
+                code += line;
+            }
+        }
+        fileStream.close();
+        test(eval, env, code);
+    }
+
+#if 0
     assert(dynamic_cast<Integer*>(test(eval, env, "(+ 2 3 -4)"))->_num == 1);
     assert(dynamic_cast<Integer*>(test(eval, env, "(- 2 3 -4)"))->_num == 3);
     assert(dynamic_cast<Integer*>(test(eval, env, "(* 2 3 -4)"))->_num == -24);
@@ -140,6 +162,16 @@ main (int32_t argc, char* argv[])
 
     test(eval, env, "(if (> 3 2) 3.0 2)");
     test(eval, env, "(if (< 3 2) 3.0 2)");
+    test(eval, env, "*");
+    test(eval, env, "((if #F * +) 3 4 5)");
+    test(eval, env, "(define (abs x) \
+                        (cond ((> x 0) x) \
+                              ((= x 0) 0) \
+                              ((< x 0) (- x))))");
+    test(eval, env, "(abs  8)");
+    test(eval, env, "(abs -8) (abs -8.4)");
+#endif
+
 #endif
 
     return 0;

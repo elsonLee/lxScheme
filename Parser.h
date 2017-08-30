@@ -9,6 +9,8 @@
 
 namespace lx {
 
+class Env;
+
 class Tokenizer
 {
     public:
@@ -73,15 +75,11 @@ class Parser
             return ret;
         }
 
-        static Expr* run (std::vector<std::string>::const_iterator& iter);
-
     public:
 
-        static Expr* run (const std::vector<std::string>& tokens)   // FIXME
-        {
-            auto&& iter = tokens.begin();
-            return run(iter);
-        }
+        static Expr* run (std::vector<std::string>::const_iterator& iter);
+
+        static Expr* run (const std::vector<std::string>& tokens);
 };
 
 }

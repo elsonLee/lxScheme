@@ -85,12 +85,6 @@ List::accept (IVisitor& visitor, Env& env)
 }
 
 Expr*
-IfExpr::accept (IVisitor& visitor, Env& env)
-{
-    return visitor.run(this, env);
-}
-
-Expr*
 ConsExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
@@ -127,6 +121,12 @@ LambdaExpr::accept (IVisitor& visitor, Env& env)
 }
 
 Expr*
+IfExpr::accept (IVisitor& visitor, Env& env)
+{
+    return visitor.run(this, env);
+}
+
+Expr*
 CondExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
@@ -137,6 +137,34 @@ ElseExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
 }
+
+//! relational operators
+
+bool Integer::operator== (const Integer& rhs) const { return _num == rhs._num; }
+bool Integer::operator!= (const Integer& rhs) const { return _num != rhs._num; }
+bool Integer::operator<  (const Integer& rhs) const { return _num <  rhs._num; }
+bool Integer::operator>  (const Integer& rhs) const { return _num >  rhs._num; }
+bool Integer::operator<= (const Integer& rhs) const { return _num <= rhs._num; }
+bool Integer::operator>= (const Integer& rhs) const { return _num >= rhs._num; }
+bool Integer::operator== (const Float& rhs) const { return _num == rhs._num; }
+bool Integer::operator!= (const Float& rhs) const { return _num != rhs._num; }
+bool Integer::operator<  (const Float& rhs) const { return _num <  rhs._num; }
+bool Integer::operator>  (const Float& rhs) const { return _num >  rhs._num; }
+bool Integer::operator<= (const Float& rhs) const { return _num <= rhs._num; }
+bool Integer::operator>= (const Float& rhs) const { return _num >= rhs._num; }
+
+bool Float::operator== (const Integer& rhs) const { return _num == rhs._num; }
+bool Float::operator!= (const Integer& rhs) const { return _num != rhs._num; }
+bool Float::operator<  (const Integer& rhs) const { return _num <  rhs._num; }
+bool Float::operator>  (const Integer& rhs) const { return _num >  rhs._num; }
+bool Float::operator<= (const Integer& rhs) const { return _num <= rhs._num; }
+bool Float::operator>= (const Integer& rhs) const { return _num >= rhs._num; }
+bool Float::operator== (const Float& rhs) const { return _num == rhs._num; }
+bool Float::operator!= (const Float& rhs) const { return _num != rhs._num; }
+bool Float::operator<  (const Float& rhs) const { return _num <  rhs._num; }
+bool Float::operator>  (const Float& rhs) const { return _num >  rhs._num; }
+bool Float::operator<= (const Float& rhs) const { return _num <= rhs._num; }
+bool Float::operator>= (const Float& rhs) const { return _num >= rhs._num; }
 
 //! operator
 Number&

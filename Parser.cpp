@@ -111,11 +111,13 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
             {
                 return new ElseExpr();
             }
-            else if (token == "#T")
+            else if (token == "#T" ||
+                     token == "#t")
             {
                 return new Boolean(true);
             }
-            else if (token == "#F")
+            else if (token == "#F" ||
+                     token == "#f")
             {
                 return new Boolean(false);
             }
@@ -125,6 +127,13 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
             }
         }
     }
+}
+
+Expr*
+Parser::run (const std::vector<std::string>& tokens)   // FIXME
+{
+    auto&& iter = tokens.begin();
+    return run(iter);
 }
 
 }
