@@ -16,6 +16,7 @@ enum class Type
     Float,
     List,
     Cons,
+    ListOp,
     Arithmetic,
     Relation,
     Define,
@@ -272,6 +273,21 @@ class ConsExpr final : public List
         ~ConsExpr () = default;
 
         Expr* accept (IVisitor& visitor, Env& env) override;
+};
+
+class ListOpExpr final : public List
+{
+    public:
+        ListOpExpr (const std::string& str) :
+            List(Type::ListOp),
+            _str(str)
+        {}
+
+        ~ListOpExpr () = default;
+
+        Expr* accept (IVisitor& visitor, Env& env) override;
+
+        std::string _str;
 };
 
 class ArithmeticExpr final : public List

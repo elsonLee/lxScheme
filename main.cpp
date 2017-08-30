@@ -170,7 +170,12 @@ main (int32_t argc, char* argv[])
                               ((< x 0) (- x))))");
     test(eval, env, "(abs  8)");
     test(eval, env, "(abs -8) (abs -8.4)");
+    test(eval, env, "(car (1 2 3))");
+    test(eval, env, "(cdr (1 2 3))");
+    test(eval, env, "(car (cons (1 2 3) (4 5 6)))");
+    test(eval, env, "(cdr (cons (1 2 3) (cons 12 (4 5 6))))");
 #endif
+
 
 #endif
 

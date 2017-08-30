@@ -140,8 +140,9 @@ Debugger::run_relation_proc (RelationExpr* expr, Env& env)
     return expr;
 }
 
+template <typename T>
 Expr*
-Debugger::run_arithmetic_proc (ArithmeticExpr* expr, Env& env)
+Debugger::run_substr_proc (T* expr, Env& env)
 {
     printf("(%s){", expr->_str.c_str());
     for (auto& e : expr->_exprs) {
@@ -169,9 +170,15 @@ Debugger::run (ConsExpr* expr, Env& env)
 }
 
 Expr*
+Debugger::run (ListOpExpr* expr, Env& env)
+{
+    return run_substr_proc(expr, env);
+}
+
+Expr*
 Debugger::run (ArithmeticExpr* expr, Env& env)
 {
-    return run_arithmetic_proc(expr, env);
+    return run_substr_proc(expr, env);
 }
 
 Expr*
@@ -284,8 +291,35 @@ Eval::run (ConsExpr* consExpr, Env& env)
 
     auto&& list = new List();
     list->_exprs.push_back(call(consExprs[0], env));
-    list->_exprs.push_back(call(consExprs[1], env));
+    auto&& consExpr_1 = call(consExprs[1], env);
+    if (consExpr_1->_type == Type::List) {
+        for (auto& e : dynamic_cast<List*>(consExpr_1)->_exprs) {
+            list->_exprs.push_back(e);
+        }
+    }
     return list;
+}
+
+Expr*
+Eval::run (ListOpExpr* expr, Env& env)
+{
+    assert(expr->_exprs.size() == 1);
+    auto& exprs = dynamic_cast<List*>(call(expr->_exprs[0], env))->_exprs;
+    int32_t size = exprs.size();
+    assert(size >= 2);
+    if (expr->_str == "car")
+    {
+        return exprs[0];
+    }
+    else
+    {
+        if (size == 2) {
+            return exprs[1];
+        } else {
+            std::vector<Expr*> contents(exprs.begin() + 1, exprs.end());
+            return new List(contents);
+        }
+    } 
 }
 
 Expr*

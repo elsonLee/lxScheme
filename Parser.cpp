@@ -87,6 +87,12 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
             expr = new ConsExpr();
             iter = std::next(iter, 1);
         }
+        else if (*iter == "car" ||
+                 *iter == "cdr")
+        {
+            expr = new ListOpExpr(*iter);
+            iter = std::next(iter, 1);
+        }
         else if (*iter == "begin")
         {
             expr = new BeginExpr();

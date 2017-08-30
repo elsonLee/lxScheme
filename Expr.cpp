@@ -25,6 +25,8 @@ Expr::type_name (Expr* expr)
         ret = "<If>"; break;
     case Type::Cons:
         ret = "<Cons>"; break;
+    case Type::ListOp:
+        ret = "<ListOp>"; break;
     case Type::Arithmetic:
         ret = "<Arithmetic>"; break;
     case Type::Relation:
@@ -86,6 +88,12 @@ List::accept (IVisitor& visitor, Env& env)
 
 Expr*
 ConsExpr::accept (IVisitor& visitor, Env& env)
+{
+    return visitor.run(this, env);
+}
+
+Expr*
+ListOpExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
 }

@@ -14,6 +14,7 @@ class Symbol;
 class Boolean;
 class List;
 class ConsExpr;
+class ListOpExpr;
 class ArithmeticExpr;
 class RelationExpr;
 class DefineExpr;
@@ -34,6 +35,7 @@ class IVisitor
         virtual Expr* run (Boolean* sym,         Env& env) = 0;
         virtual Expr* run (List* list,           Env& env) = 0;
         virtual Expr* run (ConsExpr* expr,       Env& env) = 0;
+        virtual Expr* run (ListOpExpr* expr,     Env& env) = 0;
         virtual Expr* run (ArithmeticExpr* expr, Env& env) = 0;
         virtual Expr* run (RelationExpr* expr,   Env& env) = 0;
         virtual Expr* run (DefineExpr* expr,     Env& env) = 0;
@@ -52,7 +54,10 @@ class Debugger final : public IVisitor
         Expr* call (Expr* expr);
 
         Expr* run_relation_proc (RelationExpr* expr,     Env& env);
-        Expr* run_arithmetic_proc (ArithmeticExpr* expr, Env& env);
+
+        template <typename T>
+        Expr* run_substr_proc (T* expr, Env& env);
+
         Expr* run_specific_proc (List* expr,             Env& env);
 
         Expr* run (Integer* number,      Env& env) override;
@@ -61,6 +66,7 @@ class Debugger final : public IVisitor
         Expr* run (Boolean* sym,         Env& env) override;
         Expr* run (List* list,           Env& env) override;
         Expr* run (ConsExpr* expr,       Env& env) override;
+        Expr* run (ListOpExpr* expr,     Env& env) override;
         Expr* run (ArithmeticExpr* expr, Env& env) override;
         Expr* run (RelationExpr* expr,   Env& env) override;
         Expr* run (DefineExpr* expr,     Env& env) override;
@@ -88,6 +94,7 @@ class Eval final : public IVisitor
         Expr* run (Boolean* sym,         Env& env) override;
         Expr* run (List* list,           Env& env) override;
         Expr* run (ConsExpr* expr,       Env& env) override;
+        Expr* run (ListOpExpr* expr,     Env& env) override;
         Expr* run (ArithmeticExpr* expr, Env& env) override;
         Expr* run (RelationExpr* expr,   Env& env) override;
         Expr* run (DefineExpr* expr,     Env& env) override;
