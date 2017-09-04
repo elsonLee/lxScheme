@@ -54,11 +54,13 @@ run (Eval& eval, Env& env, const std::string& code)
     while (iter != tokens.cend())
     {
         //printf("[Code]: %s\n", code.c_str());
-        printf("[ParserResult]:\n");
-        Expr* parserResult = debugger.call(Parser::run(iter));
-        printf("[EvalResult]:\n");
-        evalResult = debugger.call(eval.call(parserResult, env));
-        printf("\n");
+        //printf("[ParserResult]:\n");
+        //Expr* parserResult = debugger.call(Parser::run(iter));
+        Expr* parserResult = Parser::run(iter);
+        //printf("[EvalResult]:\n");
+        //evalResult = debugger.call(eval.call(parserResult, env));
+        evalResult = eval.call(parserResult, env);
+        //printf("\n");
     }
     return evalResult;
 }
@@ -174,8 +176,13 @@ main (int32_t argc, char* argv[])
     run(eval, env, "(cdr (1 2 3))");
     run(eval, env, "(car (cons (1 2 3) (4 5 6)))");
     run(eval, env, "(cdr (cons (1 2 3) (cons 12 (4 5 6))))");
-#endif
     run(eval, env, "(cons (1 2 3) (cons 12 nil))");
+#endif
+    run(eval, env, "(define (sqr x y) \
+                            (begin \
+                             (define (internal_func x) (* x x x)) \
+                             (+ (* x x) (* y y) (internal_func y))))");
+    run(eval, env, "(sqr 3 4)");
 
 
 #endif

@@ -256,7 +256,13 @@ Eval::run (List* list, Env& env)
     if (exprs.empty()) {
         return list;    // empty list
     } else {
+        //printf("Code:");
+        //exprs[0]->dump_info();
+        //printf("\n");
         Expr* expr = call(exprs[0], env);
+        //printf("Result:");
+        //expr->dump_info();
+        //printf("\n");
         if (expr->_type == Type::Symbol)
         {
             expr = env.query_symbol(dynamic_cast<Symbol*>(expr)->_str);
@@ -276,9 +282,10 @@ Eval::run (List* list, Env& env)
         }
         else
         {
-            auto&& map_func = [&](Expr* e)->Expr* { return call(e, env); };
+            Expr* ret = nullptr;
+            auto&& map_func = [&](Expr* e)->Expr* { ret = call(e, env); return ret; };
             std::transform(exprs.begin(), exprs.end(), exprs.begin(), map_func);
-            return list;
+            return ret;
         }
     }
 }
@@ -363,15 +370,15 @@ Expr*
 Eval::run (DefineExpr* defineExpr, Env& env)
 {
     std::vector<Expr*>& exprs = defineExpr->_exprs;
-    assert(exprs.size() == 2);
 
     Expr* var = exprs[0];
-    Expr* val = exprs[1];
 
     Expr* ret = nullptr;
 
     // (define <var> <val>)
     if (var->_type == Type::Symbol) {
+        assert(exprs.size() == 2);
+        Expr* val = exprs[1];
         std::string var_name = dynamic_cast<Symbol*>(var)->_str;
         env.define_symbol(var_name, val);
         ret = val;
@@ -385,8 +392,11 @@ Eval::run (DefineExpr* defineExpr, Env& env)
         {
             std::string varName = dynamic_cast<Symbol*>(varList[0])->_str;
             std::vector<Expr*> params(varList.begin() + 1, varList.end());
-            Expr* body = val;
-            Expr* lambdaExpr = new LambdaExpr(params, body);
+
+            auto&& body = new List();
+            std::copy(exprs.begin() + 1, exprs.end(), std::back_inserter(body->_exprs));
+
+            auto&& lambdaExpr = new LambdaExpr(params, body);
             env.define_symbol(varName, lambdaExpr);
             return new DefineExpr(varName, lambdaExpr);
         }
@@ -448,6 +458,15 @@ Expr*
 Eval::run (ElseExpr* condExpr, Env& env)
 {
     return Boolean::True();
+}
+
+
+//! dump info
+void
+Expr::dump_info (void) const
+{
+    Debugger debugger;
+    debugger.call(const_cast<Expr*>(this));
 }
 
 }

@@ -40,6 +40,8 @@ class Expr : public AutoReleaseObj
         virtual ~Expr () = default;
         virtual Expr* accept (IVisitor& eval, Env& env) = 0;
 
+        void dump_info (void) const;
+
         Type    _type;
 
     protected:
