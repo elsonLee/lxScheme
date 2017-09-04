@@ -241,6 +241,9 @@ class Boolean final : public Symbol
         bool operator>  (const Symbol& rhs) { return _str >  rhs._str; }
         bool operator<= (const Symbol& rhs) { return _str <= rhs._str; }
         bool operator>= (const Symbol& rhs) { return _str >= rhs._str; }
+
+        static Boolean* True (void);
+        static Boolean* False (void);
 };
 
 class List : public Expr
@@ -257,6 +260,8 @@ class List : public Expr
         {}
 
         virtual ~List () = default;
+
+        static List* Nil (void);
 
         Expr* accept (IVisitor& visitor, Env& env);
 

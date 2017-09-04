@@ -127,6 +127,10 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
             {
                 return new Boolean(false);
             }
+            else if (token == "nil")
+            {
+                return List::Nil();
+            }
             else
             {
                 return new Symbol(token);

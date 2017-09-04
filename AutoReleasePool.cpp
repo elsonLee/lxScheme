@@ -6,11 +6,9 @@ namespace lx {
 
 //! AutoReleasePool
 
-thread_local AutoReleasePool::PoolStack AutoReleasePool::_poolStack;
-
 AutoReleasePool::AutoReleasePool ()
 {
-    _poolStack.emplace(this);
+   get_poolStack().emplace(this);
 }
 
 AutoReleasePool::~AutoReleasePool ()
@@ -19,14 +17,14 @@ AutoReleasePool::~AutoReleasePool ()
     {
         delete *_objs.begin();
     }
-    _poolStack.pop();
+    get_poolStack().pop();
 }
 
 AutoReleasePool&
 AutoReleasePool::instance (void)
 {
-    assert(!_poolStack.empty());
-    return *_poolStack.top();
+    assert(!get_poolStack().empty());
+    return *get_poolStack().top();
 }
 
 void

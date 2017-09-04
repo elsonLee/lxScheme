@@ -43,7 +43,7 @@ class Repl
 };
 
 Expr*
-test (Eval& eval, Env& env, const std::string& code)
+run (Eval& eval, Env& env, const std::string& code)
 {
     Debugger debugger;
     Expr* evalResult = nullptr;
@@ -82,7 +82,7 @@ main (int32_t argc, char* argv[])
 #ifdef REPL
     Repl::run();
 #else
-    // testcase
+    // runcase
     Eval eval;
     Env env(nullptr);
     add_global_symbol(eval, env, "+", "(+)");
@@ -102,79 +102,80 @@ main (int32_t argc, char* argv[])
             }
         }
         fileStream.close();
-        test(eval, env, code);
+        run(eval, env, code);
     }
 
 #if 0
-    assert(dynamic_cast<Integer*>(test(eval, env, "(+ 2 3 -4)"))->_num == 1);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(- 2 3 -4)"))->_num == 3);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(* 2 3 -4)"))->_num == -24);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(/ 2 3 -4)"))->_num == 0);
-    assert(dynamic_cast<Float*>(test(eval, env, "(+ 2 3.0 -4)"))->_num == 1.0);
-    assert(dynamic_cast<Float*>(test(eval, env, "(- 2 3.0 -4)"))->_num == 3.0);
-    assert(dynamic_cast<Float*>(test(eval, env, "(* 2 3.0 -4)"))->_num == -24.0);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(define a 3)"))->_num == 3);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(* (- 1 a 2) (+ 3 4) (/ 8 2))"))->_num == -112);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(define a -2)"))->_num == -2);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(* (- 1 a 2) (+ 3 4) (/ 8 2))"))->_num == 28);
-    //assert(dynamic_cast<Symbol*>(test(eval, env, "#T"))->_str == "#T");
-    //assert(dynamic_cast<Symbol*>(test(eval, env, "#F"))->_str == "#F");
-    //assert(dynamic_cast<Integer*>(test(eval, env, "(cond ((> 1 2) 3) (else 4))"))->_num == 4);
-    assert(dynamic_cast<Integer*>(test(eval, env, "(cond ((> 1 2) 3) ((<= 37 38) (+ 5 4)) (else 4))"))->_num == 9);
-    test(eval, env, "(define empty_lambda (lambda () (+ 1 3)))");
-    assert(dynamic_cast<Integer*>(test(eval, env, "(empty_lambda)"))->_num == 4);
-    test(eval, env, "(define (factorials n) ( cond ((= n 1) 1) (else (* n (factorials (- n 1))))))");
-    assert(dynamic_cast<Integer*>(test(eval, env, "(factorials 5)"))->_num == 120);
-    test(eval, env, "(define (sqr x y) \
+    assert(dynamic_cast<Integer*>(run(eval, env, "(+ 2 3 -4)"))->_num == 1);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(- 2 3 -4)"))->_num == 3);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(* 2 3 -4)"))->_num == -24);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(/ 2 3 -4)"))->_num == 0);
+    assert(dynamic_cast<Float*>(run(eval, env, "(+ 2 3.0 -4)"))->_num == 1.0);
+    assert(dynamic_cast<Float*>(run(eval, env, "(- 2 3.0 -4)"))->_num == 3.0);
+    assert(dynamic_cast<Float*>(run(eval, env, "(* 2 3.0 -4)"))->_num == -24.0);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(define a 3)"))->_num == 3);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(* (- 1 a 2) (+ 3 4) (/ 8 2))"))->_num == -112);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(define a -2)"))->_num == -2);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(* (- 1 a 2) (+ 3 4) (/ 8 2))"))->_num == 28);
+    //assert(dynamic_cast<Symbol*>(run(eval, env, "#T"))->_str == "#T");
+    //assert(dynamic_cast<Symbol*>(run(eval, env, "#F"))->_str == "#F");
+    //assert(dynamic_cast<Integer*>(run(eval, env, "(cond ((> 1 2) 3) (else 4))"))->_num == 4);
+    assert(dynamic_cast<Integer*>(run(eval, env, "(cond ((> 1 2) 3) ((<= 37 38) (+ 5 4)) (else 4))"))->_num == 9);
+    run(eval, env, "(define empty_lambda (lambda () (+ 1 3)))");
+    assert(dynamic_cast<Integer*>(run(eval, env, "(empty_lambda)"))->_num == 4);
+    run(eval, env, "(define (factorials n) ( cond ((= n 1) 1) (else (* n (factorials (- n 1))))))");
+    assert(dynamic_cast<Integer*>(run(eval, env, "(factorials 5)"))->_num == 120);
+    run(eval, env, "(define (sqr x y) \
                             (begin \
                              (define (internal_func x) (* x x x)) \
                              (+ (* x x) (* y y) (internal_func y))))");
-    assert(dynamic_cast<Integer*>(test(eval, env, "(sqr 3 4)"))->_num == 89);;
-    //test(eval, env, "(< 423 534)");
-    //test(eval, env, "(define sqr (lambda (x y) (+ (* x x) (* y y))))");
-    //test(eval, env, "(sqr 3 4)");
-    //test(eval, env, "((lambda (x y) (+ (* x x) (* y y))) 3 4)");
-    //test(eval, env, "(define (sqr x y) (+ (* x x) (* y y)))");
-    //test(eval, env, "(sqr 3 4)");
-    //test(eval, env, "(1 2 3 (+ 1 4))");
-    //test(eval, env, "(cons 1 (cons 2 3))");
-    test(eval, env, "(define (factorials n) ( cond ((= n 1) 1) (else (* n (factorials (- n 1))))))");
-    assert(dynamic_cast<Integer*>(test(eval, env, "(factorials 5)"))->_num == 120);
-    test(eval, env, "(+ 7 3)");
-    test(eval, env, "(- 7 3)");
-    test(eval, env, "(* 7 3)");
-    test(eval, env, "(/ 7 3)");
+    assert(dynamic_cast<Integer*>(run(eval, env, "(sqr 3 4)"))->_num == 89);;
+    //run(eval, env, "(< 423 534)");
+    //run(eval, env, "(define sqr (lambda (x y) (+ (* x x) (* y y))))");
+    //run(eval, env, "(sqr 3 4)");
+    //run(eval, env, "((lambda (x y) (+ (* x x) (* y y))) 3 4)");
+    //run(eval, env, "(define (sqr x y) (+ (* x x) (* y y)))");
+    //run(eval, env, "(sqr 3 4)");
+    //run(eval, env, "(1 2 3 (+ 1 4))");
+    //run(eval, env, "(cons 1 (cons 2 3))");
+    run(eval, env, "(define (factorials n) ( cond ((= n 1) 1) (else (* n (factorials (- n 1))))))");
+    assert(dynamic_cast<Integer*>(run(eval, env, "(factorials 5)"))->_num == 120);
+    run(eval, env, "(+ 7 3)");
+    run(eval, env, "(- 7 3)");
+    run(eval, env, "(* 7 3)");
+    run(eval, env, "(/ 7 3)");
 
-    test(eval, env, "(+ 7.2 3)");
-    test(eval, env, "(- 7.2 3)");
-    test(eval, env, "(* 7.2 3)");
-    test(eval, env, "(/ 7.2 3)");
+    run(eval, env, "(+ 7.2 3)");
+    run(eval, env, "(- 7.2 3)");
+    run(eval, env, "(* 7.2 3)");
+    run(eval, env, "(/ 7.2 3)");
 
-    test(eval, env, "(+ 7 3.4)");
-    test(eval, env, "(- 7 3.4)");
-    test(eval, env, "(* 7 3.4)");
-    test(eval, env, "(/ 7 3.4)");
+    run(eval, env, "(+ 7 3.4)");
+    run(eval, env, "(- 7 3.4)");
+    run(eval, env, "(* 7 3.4)");
+    run(eval, env, "(/ 7 3.4)");
 
-    test(eval, env, "(+ 7.2 3.4)");
-    test(eval, env, "(- 7.2 3.4)");
-    test(eval, env, "(* 7.2 3.4)");
-    test(eval, env, "(/ 7.2 3.4)");
+    run(eval, env, "(+ 7.2 3.4)");
+    run(eval, env, "(- 7.2 3.4)");
+    run(eval, env, "(* 7.2 3.4)");
+    run(eval, env, "(/ 7.2 3.4)");
 
-    test(eval, env, "(if (> 3 2) 3.0 2)");
-    test(eval, env, "(if (< 3 2) 3.0 2)");
-    test(eval, env, "*");
-    test(eval, env, "((if #F * +) 3 4 5)");
-    test(eval, env, "(define (abs x) \
+    run(eval, env, "(if (> 3 2) 3.0 2)");
+    run(eval, env, "(if (< 3 2) 3.0 2)");
+    run(eval, env, "*");
+    run(eval, env, "((if #F * +) 3 4 5)");
+    run(eval, env, "(define (abs x) \
                         (cond ((> x 0) x) \
                               ((= x 0) 0) \
                               ((< x 0) (- x))))");
-    test(eval, env, "(abs  8)");
-    test(eval, env, "(abs -8) (abs -8.4)");
-    test(eval, env, "(car (1 2 3))");
-    test(eval, env, "(cdr (1 2 3))");
-    test(eval, env, "(car (cons (1 2 3) (4 5 6)))");
-    test(eval, env, "(cdr (cons (1 2 3) (cons 12 (4 5 6))))");
+    run(eval, env, "(abs  8)");
+    run(eval, env, "(abs -8) (abs -8.4)");
+    run(eval, env, "(car (1 2 3))");
+    run(eval, env, "(cdr (1 2 3))");
+    run(eval, env, "(car (cons (1 2 3) (4 5 6)))");
+    run(eval, env, "(cdr (cons (1 2 3) (cons 12 (4 5 6))))");
 #endif
+    run(eval, env, "(cons (1 2 3) (cons 12 nil))");
 
 
 #endif

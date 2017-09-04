@@ -54,7 +54,12 @@ class AutoReleasePool final
         };
 
         std::set<AutoReleaseObj*>   _objs;
-        static thread_local PoolStack _poolStack;
+
+        static PoolStack& get_poolStack (void)
+        {
+            static thread_local PoolStack _poolStack;
+            return _poolStack;
+        }
 };
 
 }

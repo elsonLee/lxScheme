@@ -5,6 +5,27 @@
 
 namespace lx {
 
+Boolean*
+Boolean::True (void)
+{
+    static Boolean* t = new Boolean(true);
+    return t;
+}
+
+Boolean*
+Boolean::False (void)
+{
+    static Boolean* f = new Boolean(false);
+    return f;
+}
+
+List*
+List::Nil (void)
+{
+    static List* l = new List();
+    return l;
+}
+
 std::string
 Expr::type_name (Expr* expr)
 {

@@ -344,15 +344,15 @@ Eval::run (RelationExpr* relationExpr, Env& env)
     Number* numX = dynamic_cast<Number*>(x);
     Number* numY = dynamic_cast<Number*>(y);
     if (relationExpr->_str == "=") {
-        return (*numX == *numY)? new Boolean(true) : new Boolean(false);
+        return (*numX == *numY)? Boolean::True() : Boolean::False();
     } else if (relationExpr->_str == "<") {
-        return (*numX <  *numY)? new Boolean(true) : new Boolean(false);
+        return (*numX <  *numY)? Boolean::True() : Boolean::False();
     } else if (relationExpr->_str == "<=") {
-        return (*numX <= *numY)? new Boolean(true) : new Boolean(false);
+        return (*numX <= *numY)? Boolean::True() : Boolean::False();
     } else if (relationExpr->_str == ">") {
-        return (*numX >  *numY)? new Boolean(true) : new Boolean(false);
+        return (*numX >  *numY)? Boolean::True() : Boolean::False();
     } else if (relationExpr->_str == ">=") {
-        return (*numX >= *numY)? new Boolean(true) : new Boolean(false);
+        return (*numX >= *numY)? Boolean::True() : Boolean::False();
     } else {
         printf("no such relation expr: %s\n", relationExpr->_str.c_str());
         return nullptr;
@@ -420,7 +420,7 @@ Eval::run (IfExpr* ifExpr, Env& env)
     assert(ifExprs.size() == 3);
 
     Expr* predicate = call(ifExprs[0], env);
-    if (*dynamic_cast<Boolean*>(predicate) == Boolean(true)) {
+    if (dynamic_cast<Boolean*>(predicate) == Boolean::True()) {
         return call(ifExprs[1], env);
     } else {
         return call(ifExprs[2], env);
@@ -436,7 +436,7 @@ Eval::run (CondExpr* condExpr, Env& env)
         List* exprList = dynamic_cast<List*>(expr);
         assert(exprList->_exprs.size() == 2);
         Expr* predicate = call(exprList->_exprs[0], env);
-        if (*dynamic_cast<Boolean*>(predicate) == Boolean(true)) {
+        if (dynamic_cast<Boolean*>(predicate) == Boolean::True()) {
             return call(exprList->_exprs[1], env);
         }
     }
@@ -447,7 +447,7 @@ Eval::run (CondExpr* condExpr, Env& env)
 Expr*
 Eval::run (ElseExpr* condExpr, Env& env)
 {
-    return new Boolean(true);
+    return Boolean::True();
 }
 
 }
