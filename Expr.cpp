@@ -341,4 +341,14 @@ Float::beDiv (Float& rhs)
     return *(new Float(rhs._num / _num));
 }
 
+//! copy ctors
+
+List::List (const List& rhs) :
+    Expr(rhs)
+{
+    for (auto&& e : rhs._exprs) {
+        _exprs.push_back(e->clone());
+    }
+}
+
 }

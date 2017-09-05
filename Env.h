@@ -15,7 +15,7 @@ class Frame
 
         bool set_symbol (const std::string& var, Expr* val);
 
-        Expr* query_symbol (const std::string& var) const;
+        const Expr* query_symbol (const std::string& var) const;
 
     private:
         std::unordered_map<std::string, Expr*>   _variables;
@@ -26,24 +26,18 @@ class Env
     public:
         Env (Env* upperEnv) :
             _upperEnv(upperEnv), _frame()
-        {
-            printf("Add Env: %p [%p]\n", this, upperEnv);
-        }
+        {}
 
         Env (Env& upperEnv) :
             _upperEnv(&upperEnv), _frame()
-        {
-            printf("Add Env: %p [%p]\n", this, &upperEnv);
-        }
+        {}
 
-        ~Env () {
-           printf("Del Env: %p]\n", this);
-        }
+        ~Env () = default;
 
         void extend_symbols (std::vector<std::string>& params,
                              std::vector<Expr*>& args);
 
-        Expr* query_symbol (const std::string& var) const;
+        const Expr* query_symbol (const std::string& var) const;
 
         bool set_symbol (const std::string& var, Expr* val);
 

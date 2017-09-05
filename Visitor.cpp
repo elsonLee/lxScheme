@@ -11,11 +11,11 @@ Expr*
 Eval::run_proc (ArithmeticExpr* arithExpr, std::vector<Expr*>& args, Env& env)
 {
     std::vector<Expr*>& exprs = args;
-    int32_t size = exprs.size();
+    auto size = exprs.size();
 
     // uary -
     if (arithExpr->_str == "-" && size == 1) {
-        Number* operands = dynamic_cast<Number*>(call(exprs[0], env));
+        auto&& operands = dynamic_cast<Number*>(call(exprs[0], env));
         return &(-*operands);
     }
 
@@ -24,10 +24,10 @@ Eval::run_proc (ArithmeticExpr* arithExpr, std::vector<Expr*>& args, Env& env)
         exit(-1);
     }
 
-    Number* init = dynamic_cast<Number*>(call(exprs[0], env));
-    Number* ret = init;
+    auto&& init = dynamic_cast<Number*>(call(exprs[0], env));
+    auto&& ret = init;
 
-    for (auto i = 1; i < size; i++) {
+    for (auto i = 1u; i < size; i++) {
         Number* operands = dynamic_cast<Number*>(call(exprs[i], env));
         if (arithExpr->_str == "+") {
             ret = &(*ret + *operands);
@@ -53,16 +53,16 @@ Eval::run_proc (LambdaExpr* lambdaExpr, std::vector<Expr*>& args, Env& env)
 {
     auto& lambdaExprs = lambdaExpr->_exprs;
     assert(lambdaExprs.size() == 2);
-    Expr* paramsExpr = lambdaExprs[0];
+    auto&& paramsExpr = lambdaExprs[0];
     assert(paramsExpr->_type == Type::List);
 
-    std::vector<Expr*> paramsExprs = dynamic_cast<List*>(paramsExpr)->_exprs;
+    auto& paramsExprs = dynamic_cast<List*>(paramsExpr)->_exprs;
     std::vector<std::string> params;
     for (auto& paramExpr : paramsExprs) {
         assert(paramExpr->_type == Type::Symbol);
         params.push_back(dynamic_cast<Symbol*>(paramExpr)->_str);
     }
-    Expr* bodyExpr = lambdaExprs[1];
+    auto&& bodyExpr = lambdaExprs[1];
 
     //assert(params.size() == args.size());
 
@@ -79,7 +79,7 @@ Debugger::call (Expr* expr)
 {
 #if 1
     static Env env(nullptr);
-    Expr* ret = expr->accept(*this, env);
+    auto&& ret = expr->accept(*this, env);
     printf("\n");
     return ret;
 #else
@@ -126,7 +126,7 @@ Expr*
 Debugger::run (List* list, Env& env)
 {
     printf("{");
-    for (auto& e : list->_exprs) {
+    for (auto&& e : list->_exprs) {
         e->accept(*this, env);
     }
     printf("}");
@@ -137,7 +137,7 @@ Expr*
 Debugger::run_relation_proc (RelationExpr* expr, Env& env)
 {
     printf("(%s){", expr->_str.c_str());
-    for (auto& e : expr->_exprs) {
+    for (auto&& e : expr->_exprs) {
         e->accept(*this, env);
     }
     printf("}");
@@ -149,7 +149,7 @@ Expr*
 Debugger::run_substr_proc (T* expr, Env& env)
 {
     printf("(%s){", expr->_str.c_str());
-    for (auto& e : expr->_exprs) {
+    for (auto&& e : expr->_exprs) {
         e->accept(*this, env);
     }
     printf("}");
@@ -160,7 +160,7 @@ Expr*
 Debugger::run_specific_proc (List* expr, Env& env)
 {
     printf("%s{", Expr::type_name(expr).c_str());
-    for (auto& e : expr->_exprs) {
+    for (auto&& e : expr->_exprs) {
         e->accept(*this, env);
     }
     printf("\n}");
@@ -243,8 +243,8 @@ Eval::run (Float* number, Env& env)
 Expr*
 Eval::run (Symbol* sym, Env& env)
 {
-    Expr* ret = env.query_symbol(sym->_str);
-    return ret;
+    const auto&& expr = env.query_symbol(sym->_str);
+    return expr->clone();
 }
 
 Expr*
@@ -260,10 +260,10 @@ Eval::run (List* list, Env& env)
     if (exprs.empty()) {
         return list;    // empty list
     } else {
-        Expr* expr = call(exprs[0], env);
+        auto&& expr = call(exprs[0], env);
         if (expr->_type == Type::Symbol)
         {
-            expr = env.query_symbol(dynamic_cast<Symbol*>(expr)->_str);
+            expr = env.query_symbol(dynamic_cast<Symbol*>(expr)->_str)->clone();
         }
 
         if (expr->_type == Type::Lambda)
@@ -280,7 +280,7 @@ Eval::run (List* list, Env& env)
         }
         else
         {
-            Expr* ret = expr;
+            auto&& ret = expr;
             auto&& map_func = [&](Expr* e)->Expr* { ret = call(e, env); return ret; };
             std::transform(exprs.begin() + 1, exprs.end(), exprs.begin(), map_func);
             return ret;
@@ -310,7 +310,7 @@ Eval::run (ListOpExpr* expr, Env& env)
 {
     assert(expr->_exprs.size() == 1);
     auto& exprs = dynamic_cast<List*>(call(expr->_exprs[0], env))->_exprs;
-    int32_t size = exprs.size();
+    auto size = exprs.size();
     assert(size >= 2);
     if (expr->_str == "car")
     {
@@ -340,14 +340,14 @@ Eval::run (ArithmeticExpr* arithExpr, Env& env)
 Expr*
 Eval::run (RelationExpr* relationExpr, Env& env)
 {
-    std::vector<Expr*>& exprs = relationExpr->_exprs;
+    auto& exprs = relationExpr->_exprs;
     assert(exprs.size() == 2);
 
-    Expr* x = call(exprs[0], env);
-    Expr* y = call(exprs[1], env);
+    auto&& x = call(exprs[0], env);
+    auto&& y = call(exprs[1], env);
 
-    Number* numX = dynamic_cast<Number*>(x);
-    Number* numY = dynamic_cast<Number*>(y);
+    auto&& numX = dynamic_cast<Number*>(x);
+    auto&& numY = dynamic_cast<Number*>(y);
     if (relationExpr->_str == "=") {
         return (*numX == *numY)? Boolean::True() : Boolean::False();
     } else if (relationExpr->_str == "<") {
@@ -367,17 +367,16 @@ Eval::run (RelationExpr* relationExpr, Env& env)
 Expr*
 Eval::run (DefineExpr* defineExpr, Env& env)
 {
-    std::vector<Expr*>& exprs = defineExpr->_exprs;
+    auto& exprs = defineExpr->_exprs;
 
-    Expr* var = exprs[0];
-
+    auto&& var = exprs[0];
     Expr* ret = nullptr;
 
     // (define <var> <val>)
     if (var->_type == Type::Symbol) {
         assert(exprs.size() == 2);
-        Expr* val = exprs[1];
-        std::string var_name = dynamic_cast<Symbol*>(var)->_str;
+        auto&& val = exprs[1];
+        auto var_name = dynamic_cast<Symbol*>(var)->_str;
         env.define_symbol(var_name, val);
         ret = defineExpr;
     }
@@ -392,7 +391,7 @@ Eval::run (DefineExpr* defineExpr, Env& env)
             std::string varName = dynamic_cast<Symbol*>(varList[0])->_str;
             std::vector<Expr*> params(varList.begin() + 1, varList.end());
 
-            List* body = new List();
+            auto&& body = new List();
             std::copy(exprs.begin() + 1, exprs.end(), std::back_inserter(body->_exprs));
 
             auto&& lambdaExpr = new LambdaExpr(params, body);
@@ -410,7 +409,7 @@ Expr*
 Eval::run (BeginExpr* beginExpr, Env& env)
 {
     Expr* ret = nullptr;
-    for (auto& expr : beginExpr->_exprs)
+    for (auto&& expr : beginExpr->_exprs)
     {
         ret = call(expr, env);
     }
@@ -429,7 +428,7 @@ Eval::run (IfExpr* ifExpr, Env& env)
     auto& ifExprs = ifExpr->_exprs;
     assert(ifExprs.size() == 3);
 
-    Expr* predicate = call(ifExprs[0], env);
+    auto&& predicate = call(ifExprs[0], env);
     if (dynamic_cast<Boolean*>(predicate) == Boolean::True()) {
         return call(ifExprs[1], env);
     } else {
@@ -440,12 +439,12 @@ Eval::run (IfExpr* ifExpr, Env& env)
 Expr*
 Eval::run (CondExpr* condExpr, Env& env)
 {
-    for (auto& expr : condExpr->_exprs)
+    for (auto&& expr : condExpr->_exprs)
     {
         assert(expr->_type == Type::List);
-        List* exprList = dynamic_cast<List*>(expr);
+        auto&& exprList = dynamic_cast<List*>(expr);
         assert(exprList->_exprs.size() == 2);
-        Expr* predicate = call(exprList->_exprs[0], env);
+        auto&& predicate = call(exprList->_exprs[0], env);
         if (dynamic_cast<Boolean*>(predicate) == Boolean::True()) {
             return call(exprList->_exprs[1], env);
         }

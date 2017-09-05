@@ -3,6 +3,7 @@
 #include <unordered_map>
 
 #include "Visitor.h"
+#include "Expr.h"
 #include "Env.h"
 
 class Expr;
@@ -14,7 +15,12 @@ namespace lx {
 void
 Frame::add_symbol (const std::string& var, Expr* val)
 {
+#if 0
     printf("Add Sym: %s\n", var.c_str());
+    printf("--------------\n");
+    val->dump_info();
+    printf("--------------\n");
+#endif
     assert(_variables.find(var) == _variables.end());
     _variables.insert(std::make_pair(var, val));
 }
@@ -22,7 +28,12 @@ Frame::add_symbol (const std::string& var, Expr* val)
 bool
 Frame::set_symbol (const std::string& var, Expr* val)
 {
+#if 0
     printf("Set Sym: %s\n", var.c_str());
+    printf("--------------\n");
+    val->dump_info();
+    printf("--------------\n");
+#endif
     const auto& iter = _variables.find(var);
     if (iter == _variables.end()) {
         return false;
@@ -32,14 +43,19 @@ Frame::set_symbol (const std::string& var, Expr* val)
     }
 }
 
-Expr*
+const Expr*
 Frame::query_symbol (const std::string& var) const
 {
     const auto& iter = _variables.find(var);
     if (iter == _variables.end()) {
         return nullptr;
     } else {
+#if 0
         printf("Query Sym: %s\n", var.c_str());
+        printf("--------------\n");
+        iter->second->dump_info();
+        printf("--------------\n");
+#endif
         return iter->second;
     }
 }
@@ -56,10 +72,10 @@ Env::extend_symbols (std::vector<std::string>& params,
     }
 }
 
-Expr*
+const Expr*
 Env::query_symbol (const std::string& var) const
 {
-    Expr* ret = _frame.query_symbol(var);
+    const Expr* ret = _frame.query_symbol(var);
 
     if (!ret && _upperEnv) {
         ret = _upperEnv->query_symbol(var);
