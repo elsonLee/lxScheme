@@ -77,10 +77,14 @@ Eval::run_proc (LambdaExpr* lambdaExpr, std::vector<Expr*>& args, Env& env)
 Expr*
 Debugger::call (Expr* expr)
 {
-    Env env(nullptr);
+#if 1
+    static Env env(nullptr);
     Expr* ret = expr->accept(*this, env);
     printf("\n");
     return ret;
+#else
+    return expr;
+#endif
 }
 
 Expr*
@@ -256,13 +260,7 @@ Eval::run (List* list, Env& env)
     if (exprs.empty()) {
         return list;    // empty list
     } else {
-        //printf("Code:");
-        //exprs[0]->dump_info();
-        //printf("\n");
         Expr* expr = call(exprs[0], env);
-        //printf("Result:");
-        //expr->dump_info();
-        //printf("\n");
         if (expr->_type == Type::Symbol)
         {
             expr = env.query_symbol(dynamic_cast<Symbol*>(expr)->_str);
@@ -282,9 +280,9 @@ Eval::run (List* list, Env& env)
         }
         else
         {
-            Expr* ret = nullptr;
+            Expr* ret = expr;
             auto&& map_func = [&](Expr* e)->Expr* { ret = call(e, env); return ret; };
-            std::transform(exprs.begin(), exprs.end(), exprs.begin(), map_func);
+            std::transform(exprs.begin() + 1, exprs.end(), exprs.begin(), map_func);
             return ret;
         }
     }
@@ -381,24 +379,26 @@ Eval::run (DefineExpr* defineExpr, Env& env)
         Expr* val = exprs[1];
         std::string var_name = dynamic_cast<Symbol*>(var)->_str;
         env.define_symbol(var_name, val);
-        ret = val;
+        ret = defineExpr;
     }
     // (define (<var> <param1>...<paramN>) <body>)
     // (define <var> (lambda (<param1>...<paramN>) <body>)
     else if (var->_type == Type::List)
     {
+        assert(exprs.size() >= 2);
         std::vector<Expr*> varList = dynamic_cast<List*>(var)->_exprs;
         if (varList[0]->_type == Type::Symbol)
         {
             std::string varName = dynamic_cast<Symbol*>(varList[0])->_str;
             std::vector<Expr*> params(varList.begin() + 1, varList.end());
 
-            auto&& body = new List();
+            List* body = new List();
             std::copy(exprs.begin() + 1, exprs.end(), std::back_inserter(body->_exprs));
 
             auto&& lambdaExpr = new LambdaExpr(params, body);
             env.define_symbol(varName, lambdaExpr);
-            return new DefineExpr(varName, lambdaExpr);
+            //return new DefineExpr(varName, lambdaExpr);
+            ret = defineExpr;
         }
     } else {
         assert(0);

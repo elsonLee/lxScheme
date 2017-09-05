@@ -14,6 +14,7 @@ namespace lx {
 void
 Frame::add_symbol (const std::string& var, Expr* val)
 {
+    printf("Add Sym: %s\n", var.c_str());
     assert(_variables.find(var) == _variables.end());
     _variables.insert(std::make_pair(var, val));
 }
@@ -21,6 +22,7 @@ Frame::add_symbol (const std::string& var, Expr* val)
 bool
 Frame::set_symbol (const std::string& var, Expr* val)
 {
+    printf("Set Sym: %s\n", var.c_str());
     const auto& iter = _variables.find(var);
     if (iter == _variables.end()) {
         return false;
@@ -37,6 +39,7 @@ Frame::query_symbol (const std::string& var) const
     if (iter == _variables.end()) {
         return nullptr;
     } else {
+        printf("Query Sym: %s\n", var.c_str());
         return iter->second;
     }
 }
@@ -60,6 +63,10 @@ Env::query_symbol (const std::string& var) const
 
     if (!ret && _upperEnv) {
         ret = _upperEnv->query_symbol(var);
+    }
+
+    if (!ret) {
+        printf("[Warning] Cannot find symbol %s\n", var.c_str());
     }
 
     return ret;

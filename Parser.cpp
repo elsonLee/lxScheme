@@ -118,12 +118,14 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
                 return new ElseExpr();
             }
             else if (token == "#T" ||
-                     token == "#t")
+                     token == "#t" ||
+                     token == "true")
             {
                 return new Boolean(true);
             }
             else if (token == "#F" ||
-                     token == "#f")
+                     token == "#f" ||
+                     token == "false")
             {
                 return new Boolean(false);
             }

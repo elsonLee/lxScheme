@@ -26,11 +26,19 @@ class Env
     public:
         Env (Env* upperEnv) :
             _upperEnv(upperEnv), _frame()
-        {}
+        {
+            printf("Add Env: %p [%p]\n", this, upperEnv);
+        }
 
         Env (Env& upperEnv) :
             _upperEnv(&upperEnv), _frame()
-        {}
+        {
+            printf("Add Env: %p [%p]\n", this, &upperEnv);
+        }
+
+        ~Env () {
+           printf("Del Env: %p]\n", this);
+        }
 
         void extend_symbols (std::vector<std::string>& params,
                              std::vector<Expr*>& args);
