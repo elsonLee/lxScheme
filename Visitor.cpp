@@ -415,10 +415,8 @@ Expr*
 Eval::run (LetExpr* letExpr, Env& env)
 {
     auto& exprs = letExpr->_exprs;
-    assert(exprs.size() == 2);
 
     auto&& vars = exprs[0];
-    auto&& body = exprs[1];
 
     Expr* ret = nullptr;
 
@@ -426,6 +424,7 @@ Eval::run (LetExpr* letExpr, Env& env)
     // ((lambda (<var1>..<varn>) <body>)
     if (vars->_type == Type::List)
     {
+        assert(exprs.size() >= 2);
         std::vector<Expr*> varList = dynamic_cast<List*>(vars)->_exprs;
         std::vector<Expr*> params;
         std::vector<Expr*> exps;
@@ -438,6 +437,9 @@ Eval::run (LetExpr* letExpr, Env& env)
             params.push_back(var);
             exps.push_back(exp);
         }
+
+        auto&& body = new List();
+        std::copy(exprs.begin() + 1, exprs.end(), std::back_inserter(body->_exprs));
 
         auto&& procedure = new List();
         procedure->_exprs.push_back(new LambdaExpr(params, body));
