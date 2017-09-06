@@ -67,6 +67,11 @@ Parser::run (std::vector<std::string>::const_iterator& iter)
             expr = new DefineExpr();
             iter = std::next(iter, 1);
         }
+        else if (*iter == "let")
+        {
+            expr = new LetExpr();
+            iter = std::next(iter, 1);
+        }
         else if (*iter == "lambda")
         {
             expr = new LambdaExpr();

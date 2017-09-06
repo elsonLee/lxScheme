@@ -54,6 +54,8 @@ Expr::type_name (Expr* expr)
         ret = "<Relation>"; break;
     case Type::Define:
         ret = "<Define>"; break;
+    case Type::Let:
+        ret = "<Let>"; break;
     case Type::Begin:
         ret = "<Begin>"; break;
     case Type::Cond:
@@ -133,6 +135,12 @@ RelationExpr::accept (IVisitor& visitor, Env& env)
 
 Expr*
 DefineExpr::accept (IVisitor& visitor, Env& env)
+{
+    return visitor.run(this, env);
+}
+
+Expr*
+LetExpr::accept (IVisitor& visitor, Env& env)
 {
     return visitor.run(this, env);
 }

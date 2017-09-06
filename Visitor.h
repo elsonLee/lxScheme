@@ -18,6 +18,7 @@ class ListOpExpr;
 class ArithmeticExpr;
 class RelationExpr;
 class DefineExpr;
+class LetExpr;
 class BeginExpr;
 class IfExpr;
 class CondExpr;
@@ -39,6 +40,7 @@ class IVisitor
         virtual Expr* run (ArithmeticExpr* expr, Env& env) = 0;
         virtual Expr* run (RelationExpr* expr,   Env& env) = 0;
         virtual Expr* run (DefineExpr* expr,     Env& env) = 0;
+        virtual Expr* run (LetExpr* expr,        Env& env) = 0;
         virtual Expr* run (BeginExpr* expr,      Env& env) = 0;
         virtual Expr* run (IfExpr* expr,         Env& env) = 0;
         virtual Expr* run (CondExpr* expr,       Env& env) = 0;
@@ -70,6 +72,7 @@ class Debugger final : public IVisitor
         Expr* run (ArithmeticExpr* expr, Env& env) override;
         Expr* run (RelationExpr* expr,   Env& env) override;
         Expr* run (DefineExpr* expr,     Env& env) override;
+        Expr* run (LetExpr* expr,        Env& env) override;
         Expr* run (BeginExpr* expr,      Env& env) override;
         Expr* run (LambdaExpr* expr,     Env& env) override;
         Expr* run (IfExpr* expr,         Env& env) override;
@@ -98,6 +101,7 @@ class Eval final : public IVisitor
         Expr* run (ArithmeticExpr* expr, Env& env) override;
         Expr* run (RelationExpr* expr,   Env& env) override;
         Expr* run (DefineExpr* expr,     Env& env) override;
+        Expr* run (LetExpr* expr,        Env& env) override;
         Expr* run (BeginExpr* expr,      Env& env) override;
         Expr* run (LambdaExpr* expr,     Env& env) override;
         Expr* run (IfExpr* expr,         Env& env) override;

@@ -20,6 +20,7 @@ enum class Type
     Arithmetic,
     Relation,
     Define,
+    Let,
     Begin,
     If,
     Cond,
@@ -404,6 +405,23 @@ class DefineExpr final : public List
         virtual Expr* clone (void) const override
         {
             return new DefineExpr(*this);
+        }
+        Expr* accept (IVisitor& visitor, Env& env) override;
+};
+
+class LetExpr final : public List
+{
+    public:
+        LetExpr () : List(Type::Let)
+        {}
+
+        LetExpr (const LetExpr& rhs) : List(rhs) {}
+
+        ~LetExpr () = default;
+
+        virtual Expr* clone (void) const override
+        {
+            return new LetExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
 };

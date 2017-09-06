@@ -198,6 +198,12 @@ Debugger::run (DefineExpr* defineExpr, Env& env)
 }
 
 Expr*
+Debugger::run (LetExpr* defineExpr, Env& env)
+{
+    return run_specific_proc(defineExpr, env);
+}
+
+Expr*
 Debugger::run (BeginExpr* beginExpr, Env& env)
 {
     return run_specific_proc(beginExpr, env);
@@ -399,6 +405,44 @@ Eval::run (DefineExpr* defineExpr, Env& env)
             //return new DefineExpr(varName, lambdaExpr);
             ret = defineExpr;
         }
+    } else {
+        assert(0);
+    }
+    return ret;
+}
+
+Expr*
+Eval::run (LetExpr* letExpr, Env& env)
+{
+    auto& exprs = letExpr->_exprs;
+    assert(exprs.size() == 2);
+
+    auto&& vars = exprs[0];
+    auto&& body = exprs[1];
+
+    Expr* ret = nullptr;
+
+    // (let ((<var1> <expr1>)...(<varn> <exprn>)) <body>)
+    // ((lambda (<var1>..<varn>) <body>)
+    if (vars->_type == Type::List)
+    {
+        std::vector<Expr*> varList = dynamic_cast<List*>(vars)->_exprs;
+        std::vector<Expr*> params;
+        std::vector<Expr*> exps;
+        for (auto&& e : varList) {
+            assert(e->_type == Type::List);
+            auto&& varPair = dynamic_cast<List*>(e)->_exprs;
+            assert(varPair.size() == 2);
+            auto&& var = varPair[0];
+            auto&& exp = varPair[1];
+            params.push_back(var);
+            exps.push_back(exp);
+        }
+
+        auto&& procedure = new List();
+        procedure->_exprs.push_back(new LambdaExpr(params, body));
+        std::copy(exps.begin(), exps.end(), std::back_inserter(procedure->_exprs));
+        return call(procedure, env);
     } else {
         assert(0);
     }
