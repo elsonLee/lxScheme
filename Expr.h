@@ -112,7 +112,6 @@ class Integer final : public Number
         {}
 
         Integer (const Integer& rhs) : Number(rhs), _num(rhs._num) {}
-        ~Integer () = default;
 
         virtual Expr* clone (void) const override
         {
@@ -140,6 +139,11 @@ class Integer final : public Number
         bool operator<= (const Float& rhs) const;
         bool operator>= (const Float& rhs) const;
 
+        int32_t _num;
+
+    private:
+        ~Integer () = default;
+
         Number& operator- () { _num = -_num; return *this; }
 
         Number& operator+ (Number& rhs) override;
@@ -157,7 +161,6 @@ class Integer final : public Number
         Number& beMul (Float& rhs) override;
         Number& beDiv (Float& rhs) override;
 
-        int32_t _num;
 };
 
 class Float final : public Number
@@ -169,7 +172,6 @@ class Float final : public Number
         {}
 
         Float (const Float& rhs) : Number(rhs), _num(rhs._num) {}
-        ~Float () = default;
 
         virtual Expr* clone (void) const override
         {
@@ -197,6 +199,11 @@ class Float final : public Number
         bool operator<= (const Float& rhs) const;
         bool operator>= (const Float& rhs) const;
 
+        float _num;
+
+    private:
+        ~Float () = default;
+
         Number& operator- () { _num = -_num; return *this; }
 
         Number& operator+ (Number& rhs) override;
@@ -213,8 +220,6 @@ class Float final : public Number
         Number& beSub (Float& rhs) override;
         Number& beMul (Float& rhs) override;
         Number& beDiv (Float& rhs) override;
-
-        float _num;
 };
 
 class Symbol : public Expr
@@ -230,8 +235,6 @@ class Symbol : public Expr
 
         Symbol (const Symbol& rhs) : Expr(rhs), _str(rhs._str) {}
 
-        virtual ~Symbol () = default;
-
         virtual Expr* clone (void) const override
         {
             return new Symbol(*this);
@@ -246,6 +249,10 @@ class Symbol : public Expr
         bool operator>= (const Symbol& rhs) { return _str >= rhs._str; }
 
         const std::string    _str;
+
+    protected:
+        virtual ~Symbol () = default;
+
 };
 
 class Boolean final : public Symbol
@@ -256,8 +263,6 @@ class Boolean final : public Symbol
         {}
 
         Boolean (const Boolean& rhs) : Symbol(rhs) {}
-
-        ~Boolean () = default;
 
         virtual Expr* clone (void) const override
         {
@@ -274,6 +279,10 @@ class Boolean final : public Symbol
 
         static Boolean* True (void);
         static Boolean* False (void);
+
+    private:
+        ~Boolean () = default;
+
 };
 
 class List : public Expr
@@ -291,8 +300,6 @@ class List : public Expr
 
         List (const List& rhs);
 
-        virtual ~List () = default;
-
         static List* Nil (void);
 
         virtual Expr* clone (void) const override
@@ -302,6 +309,10 @@ class List : public Expr
         Expr* accept (IVisitor& visitor, Env& env);
 
         std::vector<Expr*>  _exprs;
+
+    protected:
+        virtual ~List () = default;
+
 };
 
 class ConsExpr final : public List
@@ -313,13 +324,15 @@ class ConsExpr final : public List
 
         ConsExpr (const ConsExpr& rhs) : List(rhs) {}
 
-        ~ConsExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new ConsExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~ConsExpr () = default;
+
 };
 
 class ListOpExpr final : public List
@@ -332,8 +345,6 @@ class ListOpExpr final : public List
 
         ListOpExpr (const ListOpExpr& rhs) : List(rhs), _str(rhs._str) {}
 
-        ~ListOpExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new ListOpExpr(*this);
@@ -341,6 +352,10 @@ class ListOpExpr final : public List
         Expr* accept (IVisitor& visitor, Env& env) override;
 
         std::string _str;
+
+    private:
+        ~ListOpExpr () = default;
+
 };
 
 class ArithmeticExpr final : public List
@@ -353,8 +368,6 @@ class ArithmeticExpr final : public List
 
         ArithmeticExpr (const ArithmeticExpr& rhs) : List(rhs), _str(rhs._str) {}
 
-        ~ArithmeticExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new ArithmeticExpr(*this);
@@ -362,6 +375,10 @@ class ArithmeticExpr final : public List
         Expr* accept (IVisitor& visitor, Env& env) override;
 
         std::string _str;
+
+    private:
+        ~ArithmeticExpr () = default;
+
 };
 
 class RelationExpr final : public List
@@ -374,8 +391,6 @@ class RelationExpr final : public List
 
         RelationExpr (const RelationExpr& rhs) : List(rhs), _str(rhs._str) {}
 
-        ~RelationExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new RelationExpr(*this);
@@ -383,6 +398,10 @@ class RelationExpr final : public List
         Expr* accept (IVisitor& visitor, Env& env) override;
 
         const std::string   _str;
+
+    private:
+        ~RelationExpr () = default;
+
 };
 
 class DefineExpr final : public List
@@ -400,13 +419,15 @@ class DefineExpr final : public List
 
         DefineExpr (const DefineExpr& rhs) : List(rhs) {}
 
-        ~DefineExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new DefineExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~DefineExpr () = default;
+
 };
 
 class LetExpr final : public List
@@ -417,13 +438,15 @@ class LetExpr final : public List
 
         LetExpr (const LetExpr& rhs) : List(rhs) {}
 
-        ~LetExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new LetExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~LetExpr () = default;
+
 };
 
 class BeginExpr final : public List
@@ -434,13 +457,15 @@ class BeginExpr final : public List
 
         BeginExpr (const BeginExpr& rhs) : List(rhs) {}
 
-        ~BeginExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new BeginExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~BeginExpr () = default;
+
 };
 
 class LambdaExpr final : public List
@@ -452,13 +477,15 @@ class LambdaExpr final : public List
 
         LambdaExpr (const LambdaExpr& rhs) : List(rhs) {}
 
-        ~LambdaExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new LambdaExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~LambdaExpr () = default;
+
 };
 
 class IfExpr final : public List
@@ -470,13 +497,15 @@ class IfExpr final : public List
 
         IfExpr (const IfExpr& rhs) : List(rhs) {}
 
-        ~IfExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new IfExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~IfExpr () = default;
+
 };
 
 class CondExpr final : public List
@@ -487,13 +516,15 @@ class CondExpr final : public List
 
         CondExpr (const CondExpr& rhs) : List(rhs) {}
 
-        ~CondExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new CondExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~CondExpr () = default;
+
 };
 
 class ElseExpr final : public List
@@ -504,13 +535,15 @@ class ElseExpr final : public List
 
         ElseExpr (const ElseExpr& rhs) : List(rhs) {}
 
-        ~ElseExpr () = default;
-
         virtual Expr* clone (void) const override
         {
             return new ElseExpr(*this);
         }
         Expr* accept (IVisitor& visitor, Env& env) override;
+
+    private:
+        ~ElseExpr () = default;
+
 };
 
 }
